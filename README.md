@@ -69,7 +69,7 @@ There are examples.
 The third PySINDy example needs data.
 
 ## Lisense
-MIT Lisense
+The MIT Lisense is used for this software. For more information see: [Lisense info](https://github.com/M-Vause/SEED/blob/master/LICENSE)
 
 ## Acknowledgments
 
