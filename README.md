@@ -59,17 +59,17 @@ Windows:
 ### Running SEED
 To run SEED, open the Python IDLE and open the file _SEED.py_ in the _SEED_ folder created earlier. Click _Run_ > _Run Module_ to run the software. The GUI will start up and will look like this:
 
-![alt text](https://github.com/M-Vause/SEED/GUI.jpg "SEED GUI")
+![SEED GUI](GUI.png)
 
 SEED can also be run with Jupyter Notebook. As well as the _SEED.py_ file, there is a _SEED.ipynb_ for those using Jupyter. The code is the same.
 
 ### Examples
-hi
+There are examples.
 
-The third PySINDy example needs data
+The third PySINDy example needs data.
 
 ## Lisense
-hi
+MIT Lisense
 
 ## Acknowledgments
 
