@@ -10,7 +10,7 @@
 * [Usage](#usage)
 	* [Running SEED](#running-SEED)
 	* [Examples](#examples)
-* [Lisense](#lisense)
+* [License](#license)
 * [Acknowledgments](#acknowledgments)
 
 ## Introduction
@@ -68,8 +68,8 @@ There are examples.
 
 The third PySINDy example needs data.
 
-## Lisense
-The MIT Lisense is used for this software. For more information see: [Lisense info](https://github.com/M-Vause/SEED/blob/master/LICENSE)
+## License
+The MIT License is used for this software. For more information see: [License info](https://github.com/M-Vause/SEED/blob/master/LICENSE)
 
 ## Acknowledgments
 
