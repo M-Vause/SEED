@@ -16,12 +16,12 @@
 * [Acknowledgments](#acknowledgments)
 
 ## Introduction
-SEED is a software written in Python that allows for the extraction of data from data. It does this by collating algorithms written for research into one overall package. Currently there are two different algorithms integrated into SEED and the algorithms are:
+SEED is a software written in Python that provides a GUI for the extraction of governing differential equations from data. It does this by collating algorithms written for research into one overall package. Currently there are two different algorithms integrated into SEED:
 
 * The Matlab SINDy code base written by the [Kutz Research Group](https://faculty.washington.edu/kutz/page26/) to accompany their paper [Discovering governing equations from data by sparse identification of nonlinear dynamical systems](https://www.pnas.org/content/113/15/3932.abstract)
 * [PySINDy](https://github.com/luckystarufo/pySINDy), written by Yuying Liu, Yi Chu and Lianzong Wang, following on from the research of the Kutz Research group and other SINDy research
 
-Any examples written for all sets of research have been edited for integration into SEED as to allow for the easy output of results. The ability to import a users own data has been added, to enable the analysis of further real world datasets.
+Any examples written for these sets of research have been edited for integration into SEED, but otherwise remain unedited. The ability to import a users own data to use with each algorithm has been added, to enable the analysis of further real world datasets.
 
 SEED has an easy to use GUI to allow for researchers in many different fields to access the coded algorithms, although it is written in a way as to allow for the easy expansion of its capabilities. This enables users with a knowledge of programming to expand upon and improve the software.
 
