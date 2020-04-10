@@ -3,6 +3,7 @@
 # Created by Michael Vause, 31/03/2020
 # tkinter doesn't work on macos 10.14.6
 
+
 # Check Python version 3.7 is installed, exit SEED if not
 
 print("SEED Loading")
@@ -15,6 +16,7 @@ if not py_ver.startswith("3.7"): # Exit seed if python 3.7 not in use
     print("Exiting SEED")
     sys.exit()
 
+
 # Import all necessary modules
 
 import tkinter as tk
@@ -25,10 +27,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
-#from pathlib import Path
 import importlib
 
-# Check for the Matlab engine for Python, start if installed
+# Check for the Matlab engine for Python, start it if installed
 try:
     import matlab.engine
     print("Matlab engine installed")
@@ -69,64 +70,64 @@ def refresh_ex(command):
         new_options.append(op)
         select_menu.children["menu"].add_command(label=op,command= lambda o=op:new_com(o))
     sel_var.set(new_options[0])
-    refresh_sys("<command>")
+    refresh_data("<command>")
 
-#new command for select menu
+# New command for examples select menu
 def new_com(name):
     sel_var.set(name)
-    refresh_sys("<command>")
+    refresh_data("<command>")
     
-#Refresh systems drop down menu
-def refresh_sys(command):
+# Refresh data drop down menu when "Own Data" option selected in examples
+def refresh_data(command):
     new_systems = []
-    system_menu.children["menu"].delete(0, "end")
+    data_menu.children["menu"].delete(0, "end")
     if str(sel_var.get()) == "Own Data":
         old_systems = non_hidden("Data")
         old_systems.sort()
         for sys in old_systems:
             new_systems.append(sys)
-            system_menu.children["menu"].add_command(label=sys,command= lambda s=sys:sys_var.set(s))
-        sys_var.set(new_systems[0])
+            data_menu.children["menu"].add_command(label=sys,command= lambda s=sys:data_var.set(s))
+        data_var.set(new_systems[0])
     else:
-        sys_var.set(" ")
+        data_var.set(" ")
         
     update_param_fram()
         
-#Compute button to run selected example
+# Compute button to run selected example
 def comp():
-    if str(sel_var.get()) == "Own Data":
+    if str(sel_var.get()) == "Own Data": # Compute coeffiecients for users own data
         if str(alg_var.get()) == "sparsedynamics":
             to_add = "Algorithms/"+str(alg_var.get())+"/examples"
             eng.addpath(to_add)
         
-            input_data = str(sys_var.get())
+            input_data = str(data_var.get())
             [coefout,desc] = eng.Own_Data(input_data,nargout=2)
             update_matlab(coefout,desc)
         else:
             eg = "Own_Data.py"
-            imp = eg.split(".py", 1)[0]
-            to_run = importlib.import_module(imp)
+            to_import = eg.split(".py", 1)[0]
+            to_run = importlib.import_module(to_import)
             
-            input_data = str(sys_var.get())
+            input_data = str(data_var.get())
             
             [coef,desc] = to_run.example(input_data)
             update_out(coef,desc)
-    elif str(sel_var.get()).endswith(".py"):
+    elif str(sel_var.get()).endswith(".py"): # Compute output for selected Python example
         eg = str(sel_var.get())
-        imp = eg.split(".py", 1)[0]
-        to_run = importlib.import_module(imp)
+        to_import = eg.split(".py", 1)[0]
+        to_run = importlib.import_module(to_import)
     
         [coef,desc] = to_run.example()
         update_out(coef,desc)
-    elif str(sel_var.get()).endswith(".m"):        
+    elif str(sel_var.get()).endswith(".m"): # Compute output for selected Matlab example    
         eg = str(sel_var.get())
-        imp = eg.split(".m", 1)[0]
-        imp = imp + "();"
+        to_import = eg.split(".m", 1)[0]
+        to_import = to_import + "();"
         
         to_add = "Algorithms/"+str(alg_var.get())+"/examples"
         eng.addpath(to_add)
         
-        [coefout,desc] = eng.eval(str(imp),nargout=2)
+        [coefout,desc] = eng.eval(str(to_import),nargout=2)
         update_matlab(coefout,desc)
     
 # Update output list box and plot
@@ -141,7 +142,7 @@ def update_out(coef,desc):
     
     plot(coef,desc)
 
-# Update the output for the matlab examples
+# Update the output for the inbuilt matlab examples
 def update_matlab(coefout,desc):
     coeflist = [ item for elem in coefout for item in elem]
         
@@ -167,9 +168,12 @@ def update_param_fram():
     module_path = module_path + "/SEED/Algorithms/"+str(alg_var.get())+"/examples"
     if module_path not in sys.path:
         sys.path.append(module_path)
-        
+
     count = 0
-    
+    variables = []
+    values = []
+
+    # Delete contents currently in parameter frame
     for child in param_fram.winfo_children():
         if count > 0:
             child.destroy()
@@ -177,21 +181,20 @@ def update_param_fram():
     
     eg = str(sel_var.get())
     
-    if eg == "Own Data":
-        variables = []
-        values = []
-    elif eg.endswith(".py"):
-        imp = eg.split(".py", 1)[0]
-        #print(imp)
-        to_run = importlib.import_module(imp)
+    if eg == "Own Data": #Own data parameters, there are none as system not know
+        pass
+    elif eg.endswith(".py"): #Python example parameters
+        to_import = eg.split(".py", 1)[0]
+        to_run = importlib.import_module(to_import)
         [variables,values] = to_run.get_params()
-    elif eg.endswith(".m"):
-        imp = eg.split(".m", 1)[0]
-        imp = imp + "(1);"
+    elif eg.endswith(".m"): #Matlab example parameters
+        to_import = eg.split(".m", 1)[0]
+        to_import = to_import + "(1);"
         to_add = "Algorithms/"+str(alg_var.get())+"/examples"
         eng.addpath(to_add)
-        [variables,values] = eng.eval(str(imp),nargout=2)
-    
+        [variables,values] = eng.eval(str(to_import),nargout=2)
+
+    # Display all variables
     height = len(variables)
     for i in range(height):
         var_text = variables[i]
@@ -202,12 +205,12 @@ def update_param_fram():
         val_box = tk.Label(param_fram, text=val_text, font=("Times",15), bg=bgc)
         val_box.grid(row=(i+1), column=2)
 
-# Plotting function
+# Plotting function for SEED's figure
 def plot(coef,desc):
     plt.clf()
     rows = len(coef)
     dims = len(coef[0])
-    
+
     for dim in range(dims):
         coef_plt = []
         desc_plt = []
@@ -221,19 +224,19 @@ def plot(coef,desc):
         if 2*len(coef_plt) > 10:
             size = 8
         else:
-            size = 13
+            size = 10
         matplotlib.rc('xtick', labelsize=size)  
         plt.subplot(dims,1,(dim+1))
         plt.bar(desc_plt,coef_plt)
-        
         plt.axhline(y=0, color='k')
 
-    # just plt.draw() won't do it here, strangely
+    # Update plot
     plt.gcf().canvas.draw()
 
 # Function to run on closing the window
 def on_closing():    
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        # Quit the Matlab engine if open
         try:
             eng.quit()
         except NameError:
@@ -245,16 +248,31 @@ def on_closing():
 
 # GUI design
 
-bgc = "lightgray"#"LightSkyBlue"#
+# Background colour
+bgc = "lightgray"
 
 #GUI window
 window = tk.Tk()
 window.title("Extracting Equations from Data")
 window.minsize(1350,780)
 window.config(bg=bgc)
-#window.resizable(False, False)  #optional
+#window.resizable(False, False)  #This is optional
 
-#Add all the Labels
+#Add all algorithm paths to software
+alg_options = non_hidden("Algorithms")
+alg_options.sort()
+to_add = alg_options
+
+if "Own Data" in to_add:
+    to_add.remove("Own Data")
+
+for alg in to_add:
+    module_path = os.path.abspath(os.path.join('..'))
+    module_path = module_path + "/SEED/Algorithms/"+str(alg)
+    if module_path not in sys.path:
+        sys.path.append(module_path)
+
+# Add all the dropdown Labels
 main_label = tk.Label(window,text="Extracting Equations from Data",font=("Times",35,"bold","underline"),padx=5,pady=10,bg=bgc)
 main_label.grid(row=0,column=0,rowspan=2,columnspan=4)
 
@@ -264,13 +282,11 @@ algorithm_label.grid(row=2,column=0,sticky="E")
 select_label = tk.Label(window,text="Example/Own Data:",font=("Times",15,"bold"),pady=10,bg=bgc)
 select_label.grid(row=3,column=0,sticky="E")
 
-system_label = tk.Label(window,text="Input Data:",font=("Times",15,"bold"),pady=10,bg=bgc)
-system_label.grid(row=4,column=0,sticky="E")
+data_label = tk.Label(window,text="Input Data:",font=("Times",15,"bold"),pady=10,bg=bgc)
+data_label.grid(row=4,column=0,sticky="E")
 
-#Creating dropdowns & variables
+# Creating dropdowns & variables
 alg_var = tk.StringVar(window)
-alg_options = non_hidden("Algorithms")
-alg_options.sort()
 alg_var.set(alg_options[0])
 
 algorithm_menu = tk.OptionMenu(window,alg_var,*alg_options,command=refresh_ex)
@@ -288,59 +304,43 @@ sel_options.sort()
 sel_options.append("Own Data")
 sel_var.set(sel_options[0])
 
-select_menu = tk.OptionMenu(window,sel_var,*sel_options,command=refresh_sys)
+select_menu = tk.OptionMenu(window,sel_var,*sel_options,command=refresh_data)
 select_menu.config(width=30,font=("Times",15),bg=bgc)
 select_menu.grid(row=3,column=1,columnspan=3,sticky="nsew")
 
-sys_var = tk.StringVar(window)
-sys_options = [" "]
-sys_var.set(" ")
+data_var = tk.StringVar(window)
+data_options = [" "]
+data_var.set(" ")
 
-system_menu = tk.OptionMenu(window,sys_var,*sys_options)
-system_menu.config(width=30,font=("Times",15),bg=bgc)
-system_menu.grid(row=4,column=1,columnspan=3,sticky="nsew")
+data_menu = tk.OptionMenu(window,data_var,*data_options)
+data_menu.config(width=30,font=("Times",15),bg=bgc)
+data_menu.grid(row=4,column=1,columnspan=3,sticky="nsew")
 
-#refresh_sys("<command>")
-
-#Add all algorithm paths to software
-to_add = alg_options
-
-if "Own Data" in to_add:
-    to_add.remove("Own Data")
-
-for alg in to_add:
-    module_path = os.path.abspath(os.path.join('..'))
-    module_path = module_path + "/SEED/Algorithms/"+str(alg)
-    if module_path not in sys.path:
-        sys.path.append(module_path)
-
-#Parameter Frame
+# Add frame for parameter display
 param_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10)
 
-#Add variable selection to frame, 1st 5 lines just for development
-t="Parameters"
-param_label1 = tk.Label(param_fram,text=t,font=("Times",15,"bold"),bg=bgc,width=62)
-param_label1.grid(row=0,column=0,columnspan=4,sticky="nsew")
+param_label = tk.Label(param_fram,text="Parameters",font=("Times",15,"bold"),bg=bgc,width=62)
+param_label.grid(row=0,column=0,columnspan=4,sticky="nsew")
 
 param_fram.grid(row=5,column=0,rowspan=2,columnspan=4,padx=5,pady=10,sticky="NW")
 
-refresh_sys("<command>")
+refresh_data("<command>")
 
-#Filename frame
-file_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10)
+# Add frame for compute button
+button_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10)
 
-name = tk.Label(file_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
-name.grid(row=0,column=0,columnspan=4)
+blank_line1 = tk.Label(button_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
+blank_line1.grid(row=0,column=0,columnspan=4)
 
-comp_but = tk.Button(file_fram,text="Compute",command=comp,font=("Times",15,"bold"),width=20,highlightbackground=bgc)
-comp_but.grid(row=1,column=1,columnspan=2,sticky="EW")
+comp_button = tk.Button(button_fram,text="Compute",command=comp,font=("Times",15,"bold"),width=20,highlightbackground=bgc)
+comp_button.grid(row=1,column=1,columnspan=2,sticky="EW")
 
-name1 = tk.Label(file_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
-name1.grid(row=2,column=0,columnspan=4)
+blank_line2 = tk.Label(button_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
+blank_line2.grid(row=2,column=0,columnspan=4)
 
-file_fram.grid(row=7,column=0,rowspan=3,columnspan=4,padx=5,sticky="SEW")
+button_fram.grid(row=7,column=0,rowspan=3,columnspan=4,padx=5,sticky="SEW")
 
-#Add frame for output values title & textbox
+# Add frame for output values title & scroll box
 fig1_fram = tk.Frame(window,bd=2,bg=bgc)
 
 fig1_label = tk.Label(fig1_fram,text="Coefficient Values",font=("Times",18,"bold"),pady=10,bg=bgc)
@@ -359,13 +359,13 @@ tv.heading('col2', text='Equation Two')
 tv.column('col2', anchor='center')
 tv.heading('col3', text='Equation Three')
 tv.column('col3', anchor='center')
-tv.grid(row=1,column=0)#sticky = (N,S,W,E))
+tv.grid(row=1,column=0)
 
 output_scroll.config(command = tv.yview)
 
 fig1_fram.grid(row=0,column=4,rowspan=5,padx=5,sticky="W")
 
-#Add frame for output graph title & plot
+# Add frame for output graph title & plot
 fig2_fram = tk.Frame(window,bd=2,bg=bgc)
 
 fig2_label = tk.Label(fig2_fram,text="Coefficient Plot",font=("Times",18,"bold"),pady=10,bg=bgc)
@@ -381,7 +381,7 @@ canvas.get_tk_widget().configure(background=bgc,width=(870))
 
 fig2_fram.grid(row=6,column=4,rowspan=2,padx=5,sticky="NW")
 
-#Enter mainloop
+# Enter mainloop
 window.protocol("WM_DELETE_WINDOW", on_closing)
 window.mainloop()
 
