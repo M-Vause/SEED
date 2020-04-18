@@ -11,7 +11,7 @@ def example():
 
     # this .mat file can be generated from two of our .m files in datasets directory,
     # but since it's too large, we'll leave the user to generate the .mat file by themselves
-    data = sio.loadmat('../SEED/Algorithms/pySINDy/datasets/reaction_diffusion.mat')
+    data = sio.loadmat('./Algorithms/pySINDy/datasets/reaction_diffusion.mat')
     #data.keys()
     print(data.keys())
 
@@ -39,7 +39,6 @@ def example():
 
     #print(activated1)
     #print(activated2)
-
 
     x = model.coefficients
     y = model.descriptions

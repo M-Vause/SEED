@@ -11,7 +11,7 @@ def example():
     import numpy as np
     
     #data = sio.loadmat('../datasets/burgers.mat')
-    data = sio.loadmat('../SEED/Algorithms/pySINDy/datasets/burgers.mat')
+    data = sio.loadmat('./Algorithms/pySINDy/datasets/burgers.mat')
     data.keys()
     
     U = np.real(data['usol'])

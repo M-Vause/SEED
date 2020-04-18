@@ -3,7 +3,7 @@ def example(input_data):
     import numpy as np
     import csv
     
-    data_path = '../Final/Data/' + input_data
+    data_path = './Data/' + input_data
     
     count = 0 #counter for row number
     variables = np.array([]) #array of variable names
