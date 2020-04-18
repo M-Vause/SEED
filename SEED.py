@@ -4,15 +4,15 @@
 # tkinter doesn't work on macos 10.14.6
 
 
-# Check Python version 3.7 is installed, exit SEED if not
+# Check Python version 3.6 or 3.7 is installed, exit SEED if not
 
 print("SEED Loading")
 import sys
 py_ver = sys.version.split(" ", 1)[0] # Get Python version
 to_print = "Python version " + py_ver + " installed"
 print(to_print)
-if not py_ver.startswith("3.7"): # Exit seed if python 3.7 not in use
-    print("Python version 3.7 required")
+if not (py_ver.startswith("3.6") or py_ver.startswith("3.7")): # Exit seed if Python 3.6 or 3.7 not in use
+    print("Python version 3.6 or 3.7 required")
     print("Exiting SEED")
     sys.exit()
 
@@ -98,11 +98,14 @@ def comp():
     if str(sel_var.get()) == "Own Data": # Compute coeffiecients for users own data
         if str(alg_var.get()) == "sparsedynamics":
             to_add = "Algorithms/"+str(alg_var.get())+"/examples"
-            eng.addpath(to_add)
-        
-            input_data = str(data_var.get())
-            [coefout,desc] = eng.Own_Data(input_data,nargout=2)
-            update_matlab(coefout,desc)
+            
+            try:
+                eng.addpath(to_add)
+                input_data = str(data_var.get())
+                [coefout,desc] = eng.Own_Data(input_data,nargout=2)
+                update_matlab(coefout,desc)
+            except NameError:
+                print("Matlab engine not installed")
         else:
             eg = "Own_Data.py"
             to_import = eg.split(".py", 1)[0]
@@ -119,16 +122,18 @@ def comp():
     
         [coef,desc] = to_run.example()
         update_out(coef,desc)
-    elif str(sel_var.get()).endswith(".m"): # Compute output for selected Matlab example    
+    elif str(sel_var.get()).endswith(".m"): # Compute output for selected Matlab example
         eg = str(sel_var.get())
         to_import = eg.split(".m", 1)[0]
         to_import = to_import + "();"
-        
         to_add = "Algorithms/"+str(alg_var.get())+"/examples"
-        eng.addpath(to_add)
         
-        [coefout,desc] = eng.eval(str(to_import),nargout=2)
-        update_matlab(coefout,desc)
+        try:
+            eng.addpath(to_add)
+            [coefout,desc] = eng.eval(str(to_import),nargout=2)
+            update_matlab(coefout,desc)
+        except NameError:
+            print("Matlab engine not installed")
     
 # Update output list box and plot
 def update_out(coef,desc):
@@ -164,8 +169,8 @@ def update_matlab(coefout,desc):
 
 # Display parameters used in each example
 def update_param_fram():
-    module_path = os.path.abspath(os.path.join('..'))
-    module_path = module_path + "/SEED/Algorithms/"+str(alg_var.get())+"/examples"
+    module_path = os.path.abspath(os.path.join('.'))
+    module_path = module_path + "/Algorithms/"+str(alg_var.get())+"/examples"
     if module_path not in sys.path:
         sys.path.append(module_path)
 
@@ -191,9 +196,13 @@ def update_param_fram():
         to_import = eg.split(".m", 1)[0]
         to_import = to_import + "(1);"
         to_add = "Algorithms/"+str(alg_var.get())+"/examples"
-        eng.addpath(to_add)
-        [variables,values] = eng.eval(str(to_import),nargout=2)
 
+        try:
+            eng.addpath(to_add)
+            [variables,values] = eng.eval(str(to_import),nargout=2)
+        except NameError:
+            print("Matlab engine not installed")
+        
     # Display all variables
     height = len(variables)
     for i in range(height):
@@ -267,8 +276,8 @@ if "Own Data" in to_add:
     to_add.remove("Own Data")
 
 for alg in to_add:
-    module_path = os.path.abspath(os.path.join('..'))
-    module_path = module_path + "/SEED/Algorithms/"+str(alg)
+    module_path = os.path.abspath(os.path.join('.'))
+    module_path = module_path + "/Algorithms/"+str(alg)
     if module_path not in sys.path:
         sys.path.append(module_path)
 
