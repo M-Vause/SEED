@@ -1,4 +1,4 @@
-# Final Main Code
+# Main Code
 
 # Created by Michael Vause, 31/03/2020
 # tkinter doesn't work on macos 10.14.6
@@ -8,6 +8,7 @@
 
 print("SEED Loading")
 import sys
+sys.setrecursionlimit(3000) # To allow fourth pySINDy example to work
 py_ver = sys.version.split(" ", 1)[0] # Get Python version
 to_print = "Python version " + py_ver + " installed"
 print(to_print)
@@ -17,18 +18,25 @@ if not (py_ver.startswith("3.6") or py_ver.startswith("3.7")): # Exit seed if Py
     sys.exit()
 
 
-# Import all necessary modules
+# Import all required modules
 
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import os
-import importlib
-
+try:
+    import tkinter as tk
+    from tkinter import ttk
+    from tkinter import messagebox
+    import numpy as np
+    import matplotlib
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+    import os
+    import importlib
+except ImportError:
+    print("Install the required modules before starting. Run: \"python -m pip install --user numpy scipy matplotlib pysindy findiff pytest pylint sphinx\" in your command line.")
+    sys.exit()
+except Exception as inst:
+    print("Error while importing: " + str(inst))
+    sys.exit()
+    
 # Check for the Matlab engine for Python, start it if installed
 try:
     import matlab.engine
@@ -95,36 +103,60 @@ def refresh_data(command):
         
 # Compute button to run selected example
 def comp():
-    if str(sel_var.get()) == "Own Data": # Compute coeffiecients for users own data
-        if str(alg_var.get()) == "sparsedynamics":
-            to_add = "Algorithms/"+str(alg_var.get())+"/examples"
-            
+    selection = str(sel_var.get())
+    if selection == "Own Data": # Compute coeffiecients for users own data
+        path = "Algorithms/"+str(alg_var.get())+"/examples"
+        examples = non_hidden(path)
+        for value in examples:
+            if value.startswith("Own_Data"):
+                eg = value
+        
+        if eg.endswith(".m"):    
+            input_data = str(data_var.get())
+            to_import = eg.split(".m", 1)[0]
+            to_import = to_import + "(\""+ input_data + "\");"
+        
             try:
-                eng.addpath(to_add)
-                input_data = str(data_var.get())
-                [coefout,desc] = eng.Own_Data(input_data,nargout=2)
+                eng.addpath(path)
+                [coefout,desc] = eng.eval(str(to_import),nargout=2)
                 update_matlab(coefout,desc)
             except NameError:
-                print("Matlab engine not installed")
+                messagebox.showwarning(title="Error", message="Example not run. Matlab engine not installed.")
+            except Exception as inst:
+                mssg = "Error in comp function 1: " + str(inst)
+                messagebox.showerror(title="Error", message=mssg)
+                
+        elif eg.endswith(".py"):
+            try:
+                to_import = eg.split(".py", 1)[0]
+                to_run = importlib.import_module(to_import)
+                input_data = str(data_var.get())
+            
+                [coef,desc] = to_run.example(input_data)
+                update_out(coef,desc)
+            except Exception as inst:
+                mssg = "Error in comp function 2: " + str(inst)
+                messagebox.showerror(title="Error", message=mssg)
         else:
-            eg = "Own_Data.py"
-            to_import = eg.split(".py", 1)[0]
+            messagebox.showerror(title="Error", message="Unable to compute own data")
+            
+    elif selection.endswith(".py"): # Compute output for selected Python example
+        try:
+            to_import = selection.split(".py", 1)[0]
             to_run = importlib.import_module(to_import)
-            
-            input_data = str(data_var.get())
-            
-            [coef,desc] = to_run.example(input_data)
-            update_out(coef,desc)
-    elif str(sel_var.get()).endswith(".py"): # Compute output for selected Python example
-        eg = str(sel_var.get())
-        to_import = eg.split(".py", 1)[0]
-        to_run = importlib.import_module(to_import)
     
-        [coef,desc] = to_run.example()
-        update_out(coef,desc)
-    elif str(sel_var.get()).endswith(".m"): # Compute output for selected Matlab example
-        eg = str(sel_var.get())
-        to_import = eg.split(".m", 1)[0]
+            [coef,desc] = to_run.example()
+            update_out(coef,desc)
+        except FileNotFoundError:
+            messagebox.showwarning(title="Error", message="The data has not been generated for this example yet. Read the README.md file for generation instructions.")
+        except RecursionError:
+            messagebox.showerror(title="Error", message="Recursion limit too small")
+        except Exception as inst:
+            mssg = "Error in comp function 3: " + str(inst)
+            messagebox.showerror(title="Error", message=mssg)
+        
+    elif selection.endswith(".m"): # Compute output for selected Matlab example
+        to_import = selection.split(".m", 1)[0]
         to_import = to_import + "();"
         to_add = "Algorithms/"+str(alg_var.get())+"/examples"
         
@@ -133,7 +165,10 @@ def comp():
             [coefout,desc] = eng.eval(str(to_import),nargout=2)
             update_matlab(coefout,desc)
         except NameError:
-            print("Matlab engine not installed")
+            messagebox.showwarning(title="Error", message="Example not run. Matlab engine not installed.")
+        except Exception as inst:
+            mssg = "Error in comp function 4: " + str(inst)
+            messagebox.showerror(title="Error", message=mssg)
     
 # Update output list box and plot
 def update_out(coef,desc):
@@ -148,23 +183,23 @@ def update_out(coef,desc):
     plot(coef,desc)
 
 # Update the output for the inbuilt matlab examples
-def update_matlab(coefout,desc):
+def update_matlab(coefout,desc):    
     coeflist = [ item for elem in coefout for item in elem]
-        
     num_rows = int(len(coeflist)/len(coefout[0]))
-        
+    num_cols = int(len(coefout[0]))
+    
     for x in range(0,num_rows):
-        row = np.array([[coeflist[len(coefout[0])*x]]])
-        for y in range(1,len(coefout[0])):
-            value = coeflist[(len(coefout[0])*x)+y]
-            row = np.append(row,[[value]])
-                
+        row = np.array([coeflist[num_cols*x]])
+        for y in range(1,num_cols):
+            value = coeflist[(num_cols*x)+y]
+            row = np.append(row,[value])
+        
         row = [row]
         if (x==0):
             coef = np.array(row)
         else:
             coef = np.append(coef, row, axis = 0)
-        
+
     update_out(coef,desc)
 
 # Display parameters used in each example
@@ -260,14 +295,15 @@ def on_closing():
 # Background colour
 bgc = "lightgray"
 
-#GUI window
+# GUI window
 window = tk.Tk()
 window.title("Extracting Equations from Data")
-window.minsize(1350,780)
+window.minsize(1000,500)
+window.maxsize(1200,670)
 window.config(bg=bgc)
 #window.resizable(False, False)  #This is optional
 
-#Add all algorithm paths to software
+# Add all algorithm paths to software
 alg_options = non_hidden("Algorithms")
 alg_options.sort()
 to_add = alg_options
@@ -360,14 +396,15 @@ output_scroll.grid(row=1,column=1,rowspan=4,sticky="nsew")
 
 tv = ttk.Treeview(fig1_fram, yscrollcommand = output_scroll.set)
 tv['columns'] = ('col1', 'col2', 'col3')
+col_width = 160
 tv.heading("#0", text='Descriptor', anchor='w')
-tv.column("#0", anchor="w")
+tv.column("#0", anchor="w", width=col_width, stretch=False)
 tv.heading('col1', text='Equation One')
-tv.column('col1', anchor='center')
+tv.column('col1', anchor='center', width=col_width, stretch=False)
 tv.heading('col2', text='Equation Two')
-tv.column('col2', anchor='center')
+tv.column('col2', anchor='center', width=col_width, stretch=False)
 tv.heading('col3', text='Equation Three')
-tv.column('col3', anchor='center')
+tv.column('col3', anchor='center', width=col_width, stretch=False)
 tv.grid(row=1,column=0)
 
 output_scroll.config(command = tv.yview)
@@ -378,21 +415,18 @@ fig1_fram.grid(row=0,column=4,rowspan=5,padx=5,sticky="W")
 fig2_fram = tk.Frame(window,bd=2,bg=bgc)
 
 fig2_label = tk.Label(fig2_fram,text="Coefficient Plot",font=("Times",18,"bold"),pady=10,bg=bgc)
-fig2_label.grid(row=0,column=0,sticky="W")
+fig2_label.grid(row=0,column=0,sticky="NW")
 
 fig2 = plt.figure()
 fig2.add_subplot(111)
 fig2.patch.set_facecolor(bgc)
-fig2.subplots_adjust(left=0.07)
+fig2.subplots_adjust(left=0.07,hspace=0.4)
 canvas = FigureCanvasTkAgg(fig2, fig2_fram)
 canvas.get_tk_widget().grid(row=1,column=0,sticky="NW")
-canvas.get_tk_widget().configure(background=bgc,width=(870))
+canvas.get_tk_widget().configure(background=bgc,width=(720),height=(350))
 
-fig2_fram.grid(row=6,column=4,rowspan=2,padx=5,sticky="NW")
+fig2_fram.grid(row=6,column=4,rowspan=3,padx=5,sticky="NW")
 
 # Enter mainloop
 window.protocol("WM_DELETE_WINDOW", on_closing)
 window.mainloop()
-
-
-
