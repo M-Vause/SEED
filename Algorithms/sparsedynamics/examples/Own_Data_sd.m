@@ -1,4 +1,4 @@
-function [vals,vars] = Own_Data(input_data)
+function [vals,vars] = Own_Data_sd(input_data)
     addpath('Data');
     addpath('Algorithms/sparsedynamics/examples/utils');
 
