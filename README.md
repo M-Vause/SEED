@@ -63,7 +63,7 @@ The GUI will start up and will look like this:
 
 * Mac:
 
-![GUI mac](https://github.com/M-Vause/SEED/blob/master/GUI_mac.png)
+![GUI mac](GUI_mac.png)
 
 * Windows:
 
