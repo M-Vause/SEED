@@ -63,7 +63,9 @@ The GUI will start up and will look like this:
 
 * Mac:
 
-<img src="GUI_mac.png" width="500"/>
+<img src="https://github.com/M-Vause/SEED/blob/master/GUI_mac.png" width="500"/>
+
+<img src="https://github.com/M-Vause/SEED/blob/master/GUI_mac.png" width="50%"/>
 
 * Windows:
 
