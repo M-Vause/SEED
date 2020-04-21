@@ -63,7 +63,7 @@ The GUI will start up and will look like this:
 
 * Mac:
 
-![GUI mac](GUI_mac.png)
+![GUI mac](GUI.png)
 
 * Windows:
 
