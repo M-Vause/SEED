@@ -21,6 +21,7 @@ if not (py_ver.startswith("3.6") or py_ver.startswith("3.7")): # Exit seed if Py
 # Import all required modules
 
 try:
+    from sys import platform
     import tkinter as tk
     from tkinter import ttk
     from tkinter import messagebox
@@ -292,14 +293,37 @@ def on_closing():
 
 # GUI design
 
-# Background colour
-bgc = "lightgray"
+# Variables to change
+
+# GUI background colour
+bgc = "lightgray" 
+
+# Correct size based on operating system
+if platform == "darwin": # macos
+    print("MacOS detected")
+    min_w = 1000
+    max_w = 1200
+    min_h = 500
+    max_h =670
+    col_width = 160
+    fig_w = 720
+    fig_h = 350
+
+else:
+    print(platform + " detected")
+    min_w = 1000
+    max_w = 1200
+    min_h = 500
+    max_h =670
+    col_width = 160
+    fig_w = 720
+    fig_h = 350
 
 # GUI window
 window = tk.Tk()
 window.title("Extracting Equations from Data")
-window.minsize(1000,500)
-window.maxsize(1200,670)
+window.minsize(min_w,min_h)
+window.maxsize(max_w,max_h)
 window.config(bg=bgc)
 #window.resizable(False, False)  #This is optional
 
@@ -396,7 +420,6 @@ output_scroll.grid(row=1,column=1,rowspan=4,sticky="nsew")
 
 tv = ttk.Treeview(fig1_fram, yscrollcommand = output_scroll.set)
 tv['columns'] = ('col1', 'col2', 'col3')
-col_width = 160
 tv.heading("#0", text='Descriptor', anchor='w')
 tv.column("#0", anchor="w", width=col_width, stretch=False)
 tv.heading('col1', text='Equation One')
@@ -423,7 +446,7 @@ fig2.patch.set_facecolor(bgc)
 fig2.subplots_adjust(left=0.07,hspace=0.4)
 canvas = FigureCanvasTkAgg(fig2, fig2_fram)
 canvas.get_tk_widget().grid(row=1,column=0,sticky="NW")
-canvas.get_tk_widget().configure(background=bgc,width=(720),height=(350))
+canvas.get_tk_widget().configure(background=bgc,width=(fig_w),height=(fig_h))
 
 fig2_fram.grid(row=6,column=4,rowspan=3,padx=5,sticky="NW")
 
