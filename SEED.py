@@ -305,6 +305,9 @@ if platform == "darwin": # macos
     max_w = 1200
     min_h = 500
     max_h =670
+    drop_w = 30
+    fram_w = 62
+    line_w = 61
     col_width = 160
     fig_w = 720
     fig_h = 350
@@ -312,9 +315,12 @@ if platform == "darwin": # macos
 else:
     print(platform + " detected")
     min_w = 1000
-    max_w = 1200
+    max_w = 1370
     min_h = 500
-    max_h =670
+    max_h =700
+    drop_w = 30
+    fram_w = 55
+    line_w = 60
     col_width = 160
     fig_w = 720
     fig_h = 350
@@ -359,7 +365,7 @@ alg_var = tk.StringVar(window)
 alg_var.set(alg_options[0])
 
 algorithm_menu = tk.OptionMenu(window,alg_var,*alg_options,command=refresh_ex)
-algorithm_menu.config(width=30,font=("Times",15),bg=bgc)
+algorithm_menu.config(width=drop_w,font=("Times",15),bg=bgc)
 algorithm_menu.grid(row=2,column=1,columnspan=3,sticky="nsew")
      
 sel_var = tk.StringVar(window)
@@ -374,7 +380,7 @@ sel_options.append("Own Data")
 sel_var.set(sel_options[0])
 
 select_menu = tk.OptionMenu(window,sel_var,*sel_options,command=refresh_data)
-select_menu.config(width=30,font=("Times",15),bg=bgc)
+select_menu.config(width=drop_w,font=("Times",15),bg=bgc)
 select_menu.grid(row=3,column=1,columnspan=3,sticky="nsew")
 
 data_var = tk.StringVar(window)
@@ -382,13 +388,13 @@ data_options = [" "]
 data_var.set(" ")
 
 data_menu = tk.OptionMenu(window,data_var,*data_options)
-data_menu.config(width=30,font=("Times",15),bg=bgc)
+data_menu.config(width=drop_w,font=("Times",15),bg=bgc)
 data_menu.grid(row=4,column=1,columnspan=3,sticky="nsew")
 
 # Add frame for parameter display
-param_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10)
+param_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10,width=fram_w)
 
-param_label = tk.Label(param_fram,text="Parameters",font=("Times",15,"bold"),bg=bgc,width=62)
+param_label = tk.Label(param_fram,text="Parameters",font=("Times",15,"bold"),bg=bgc,width=fram_w)
 param_label.grid(row=0,column=0,columnspan=4,sticky="nsew")
 
 param_fram.grid(row=5,column=0,rowspan=2,columnspan=4,padx=5,pady=10,sticky="NW")
@@ -396,15 +402,15 @@ param_fram.grid(row=5,column=0,rowspan=2,columnspan=4,padx=5,pady=10,sticky="NW"
 refresh_data("<command>")
 
 # Add frame for compute button
-button_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10)
+button_fram = tk.Frame(window,bg=bgc,bd=2,relief="sunken",pady=10,width=fram_w)
 
-blank_line1 = tk.Label(button_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
+blank_line1 = tk.Label(button_fram,text=" ",font=("Times",15),width=line_w,highlightbackground=bgc,bg=bgc)
 blank_line1.grid(row=0,column=0,columnspan=4)
 
 comp_button = tk.Button(button_fram,text="Compute",command=comp,font=("Times",15,"bold"),width=20,highlightbackground=bgc)
 comp_button.grid(row=1,column=1,columnspan=2,sticky="EW")
 
-blank_line2 = tk.Label(button_fram,text=" ",font=("Times",15),width=61,highlightbackground=bgc,bg=bgc)
+blank_line2 = tk.Label(button_fram,text=" ",font=("Times",15),width=line_w,highlightbackground=bgc,bg=bgc)
 blank_line2.grid(row=2,column=0,columnspan=4)
 
 button_fram.grid(row=7,column=0,rowspan=3,columnspan=4,padx=5,sticky="SEW")
