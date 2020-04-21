@@ -63,11 +63,11 @@ The GUI will start up and will look like this:
 
 * Mac:
 
-![](GUI_mac.png)
+![GUI mac](GUI_mac.png)
 
 * Windows:
 
-![](GUI_win.png)
+![GUI win](GUI_win.png)
 
 ### Examples
 The algorithms that have been integrated into SEED come with their own set of examples that were provided with the original research. We have edited the examples to allow for their integration into SEED, but they otherwise remain unedited. 
@@ -78,11 +78,11 @@ After you run an example, the output will look like this:
 
 * Mac:
 
-![](GUI_mac_eg.png)
+![mac eg](GUI_mac_eg.png)
 
 * Windows:
 
-![](GUI_win_eg.png)
+![win eg](GUI_win_eg.png)
 
 To understand how to interpret the output fully, consult the algorithm's documentation linked in the [Introduction](#introduction).
 
@@ -90,7 +90,7 @@ To understand how to interpret the output fully, consult the algorithm's documen
 In order to use your own data with the algorithms, the data must be saved as a _.csv_ file with one column of time series data, and up to three further columns containing the data for each recorded variable. The first row of your _.csv_ file must be the names of each variable.  
 An example is shown below:
 
-![](own_Data.png)
+![own data](Own_Data.png)
 
 Your _.csv_ file must then be saved in the _SEED > Data_ folder in order to be found by the programme. There is an example of a data file, _3d\_data.csv_, in the _Data_ folder previously mentioned.
 
